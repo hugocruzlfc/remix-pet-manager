@@ -1,7 +1,11 @@
-import { NavLink } from "@remix-run/react";
+import { NavLink, useLocation } from "@remix-run/react";
 import { PawPrint, Plus } from "lucide-react";
 
 export default function Navbar() {
+  const { pathname } = useLocation();
+
+  const createPathname = pathname === "/create";
+
   return (
     <header role="banner" className="text-light bg-secondary">
       <nav
@@ -14,10 +18,11 @@ export default function Navbar() {
             <p>Neighborhood Pet Manager</p>
           </span>
         </NavLink>
-
-        <NavLink to="/create" className="rounded-full bg-slate-300 p-1">
-          <Plus />
-        </NavLink>
+        {!createPathname && (
+          <NavLink to="/create" className="rounded-full bg-slate-300 p-1">
+            <Plus />
+          </NavLink>
+        )}
       </nav>
     </header>
   );

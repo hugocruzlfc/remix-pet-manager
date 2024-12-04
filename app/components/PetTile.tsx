@@ -18,7 +18,7 @@ export function PetTile({ pet }: PetTileProps) {
             {pet.name}
           </div>
           <Button variant="link" asChild>
-            <Link to={`/pets/${pet.id}`}>View</Link>
+            <Link to={`/pets-details/${pet.id}`}>View</Link>
           </Button>
         </CardTitle>
       </CardHeader>
