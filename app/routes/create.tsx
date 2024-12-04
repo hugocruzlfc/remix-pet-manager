@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TypographyH3 } from "@/components/ui/typography";
+import { petFormSchema } from "@/lib/form-schema";
 import { PetType } from "@prisma/client";
 import { Label } from "@radix-ui/react-label";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -18,12 +19,16 @@ export async function action({ request }: LoaderFunctionArgs) {
   const formData = await request.formData();
   const values = Object.fromEntries(formData);
 
+  const { success, data } = petFormSchema.safeParse(values);
+
+  if (!success) {
+    throw new Response("Not allowed", {
+      status: 400,
+    });
+  }
+
   await prisma.pet.create({
-    data: {
-      name: values.name as string,
-      type: values.type as PetType,
-      birthday: new Date(values.birthday as string),
-    },
+    data: data,
   });
 
   return redirect("/");
