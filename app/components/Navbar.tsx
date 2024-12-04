@@ -7,10 +7,10 @@ export default function Navbar() {
   const createPathname = pathname === "/create";
 
   return (
-    <header role="banner" className="text-light bg-secondary">
+    <header role="banner" className="text-light sticky bg-secondary">
       <nav
         role="navigation"
-        className="m-auto flex max-w-2xl flex-wrap items-center justify-center gap-4 p-4 text-center sm:justify-between"
+        className="sticky left-0 right-0 top-0 m-auto flex max-w-2xl flex-wrap items-center justify-center gap-4 p-4 text-center sm:justify-between"
       >
         <NavLink to="/">
           <span className="flex flex-wrap items-center justify-center gap-2 text-2xl">

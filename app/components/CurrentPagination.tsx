@@ -23,21 +23,33 @@ export default function CurrentPagination({
   totalPages = Number(totalPages);
 
   const previousQuery = new URLSearchParams(queryParams);
-  previousQuery.set(pageParam, (currentPage - 1).toString());
+
+  const previousQueryPage = currentPage !== 1 ? currentPage - 1 : 1;
+  previousQuery.set(pageParam, previousQueryPage.toString());
   const nextQuery = new URLSearchParams(queryParams);
-  nextQuery.set(pageParam, (currentPage + 1).toString());
+
+  const nextQueryPage =
+    currentPage !== totalPages ? currentPage + 1 : totalPages;
+  nextQuery.set(pageParam, nextQueryPage.toString());
 
   return (
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href={`?${previousQuery.toString()}`} />
+          <PaginationPrevious
+            href={`?${previousQuery.toString()}`}
+            className={currentPage === 1 ? "pointer-events-none" : ""}
+          />
         </PaginationItem>
+
         <PaginationItem>
           <PaginationEllipsis />
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href={`?${nextQuery.toString()}`} />
+          <PaginationNext
+            href={`?${nextQuery.toString()}`}
+            className={currentPage === totalPages ? "pointer-events-none" : ""}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

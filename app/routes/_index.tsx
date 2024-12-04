@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/select";
 import { TypographyH3 } from "@/components/ui/typography";
 import { prisma } from "@/lib/prisma-client";
+import { Prisma } from "@prisma/client";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useSearchParams } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -31,30 +32,32 @@ const PER_PAGE = 12;
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams;
+
   const currentPage = Math.max(Number(query.get("page") || 1), 1);
-  const options: {
-    take: number;
-    skip: number;
-    orderBy: { [key: string]: string };
-    where?: { name: { contains: string | null; mode: string } };
-  } = {
+
+  const options: Prisma.PetFindManyArgs = {
     take: PER_PAGE,
     skip: (currentPage - 1) * PER_PAGE,
     orderBy: {
       updatedAt: "desc",
     },
+    where: {},
   };
-  const countOptions: Partial<typeof options> = {};
+
+  const countOptions: Prisma.PetCountArgs = {};
 
   if (query.get("search")) {
+    const search = query.get("search") || "";
     options.where = {
       name: {
-        contains: query.get("search"),
+        contains: search,
         mode: "insensitive",
       },
     };
+
     countOptions.where = options.where;
   }
+
   if (query.get("orderBy")) {
     const orderBy = query.get("orderBy");
     options.orderBy = {
@@ -64,9 +67,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const [pets, count] = await Promise.all([
     // SELECT * FROM "Pet" WHERE name LIKE '%?%' ORDER BY column ASC|DESC LIMIT 12 OFFSET 1
-    prisma.pet.findMany({}),
+    prisma.pet.findMany(options),
     // SELECT COUNT(id) FROM "Pet"
-    prisma.pet.count(),
+    prisma.pet.count(countOptions),
   ]);
   return {
     pets,
@@ -75,50 +78,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function () {
+  const [searchParams] = useSearchParams();
   const { pets, count } = useLoaderData<typeof loader>();
   const totalPages = Math.ceil(count / PER_PAGE);
 
   return (
     <div className="space-y-5">
       <TypographyH3 title="Pets" />
-      <Form
-        // onChange={handleChange}
-        className="flex flex-wrap items-end gap-x-4 space-y-5"
-      >
-        <Input
-          name="search"
-          id="search"
-          // defaultValue={searchParams.get("search") || ""}
-          className="flex-grow"
-        />
+      <Form className="flex flex-wrap items-end gap-x-4 space-y-5">
+        <div className="flex w-full items-center gap-2">
+          <Input
+            name="search"
+            id="search"
+            defaultValue={searchParams.get("search") || ""}
+          />
+        </div>
 
         <div className="flex w-full gap-8">
-          {/* <div className="flex gap-2">
-            <label htmlFor="orderBy">Sort By:</label>
-            <select
-              name="orderBy"
-              id="orderBy"
-              className="p-0"
-              // defaultValue={searchParams.get("orderBy") || "updatedAt"}
-            >
-              <option value="name">Name</option>
-              <option value="updatedAt">Updated</option>
-            </select>
-          </div> */}
-          {/* <div className="flex gap-2">
-            <label htmlFor="orderDir">Direction:</label>
-            <select
-              name="orderDir"
-              id="orderDir"
-              className="p-0"
-              // defaultValue={searchParams.get("orderDir") || "desc"}
-            >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </div> */}
-          <Select>
-            <SelectTrigger className="w-[180px]">
+          <Select
+            name="orderBy"
+            defaultValue={searchParams.get("orderBy") || ""}
+          >
+            <SelectTrigger>
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -128,8 +109,11 @@ export default function () {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Select>
-            <SelectTrigger className="w-[180px]">
+          <Select
+            name="orderDir"
+            defaultValue={searchParams.get("orderDir") || ""}
+          >
+            <SelectTrigger>
               <SelectValue placeholder="Select a direction" />
             </SelectTrigger>
             <SelectContent>
@@ -149,15 +133,17 @@ export default function () {
         <p>{`Displaying ${pets.length} of ${count}.`}</p>
       </div>
 
-      {pets.length > 0 ? (
-        pets.map((pet) => <PetTile key={pet.id} pet={pet} />)
-      ) : (
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle>Not pets found!</CardTitle>
-          </CardHeader>
-        </Card>
-      )}
+      <div className="space-y-2">
+        {pets.length > 0 ? (
+          pets.map((pet) => <PetTile key={pet.id} pet={pet} />)
+        ) : (
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle>Not pets found!</CardTitle>
+            </CardHeader>
+          </Card>
+        )}
+      </div>
 
       {totalPages > 1 && (
         <CurrentPagination totalPages={totalPages} pageParam="page" />
