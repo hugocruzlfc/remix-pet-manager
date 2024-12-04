@@ -3,7 +3,10 @@ import type { MetaFunction } from "@remix-run/node";
 export const meta: MetaFunction = () => {
   return [
     { title: "Pet MAnager" },
-    { name: "description", content: "Welcome to Pet Manager App" },
+    {
+      name: "description",
+      content: "Welcome to Pet Manager App",
+    },
   ];
 };
 
