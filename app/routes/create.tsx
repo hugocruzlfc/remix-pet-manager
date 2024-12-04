@@ -1,4 +1,3 @@
-import DefaultLayout from "@/components/layouts/Default";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,36 +8,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TypographyH3 } from "@/components/ui/typography";
 import { PetType } from "@prisma/client";
 import { Label } from "@radix-ui/react-label";
 import { Form, Link } from "@remix-run/react";
 
-export interface CreateProps {}
-
-export function Create({}: CreateProps) {
+export default function Create() {
   return (
-    <DefaultLayout title="Create">
+    <div className="space-y-5">
+      <TypographyH3 title="Create a new pet" />
       <Form method="POST" className="grid gap-4" encType="multipart/form-data">
-        <Label htmlFor="name">Name</Label>
-        <Input name="name" id="name" />
-
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Pet Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              {Object.keys(PetType).map((petType) => (
-                <SelectItem key={petType} value={petType}>
-                  {petType}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-
-        <Label htmlFor="birthday">Birthday</Label>
-        <Input name="birthday" id="birthday" />
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <Input name="name" id="name" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="type">Type</Label>
+          <Select name="type">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Pet Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {Object.keys(PetType).map((petType) => (
+                  <SelectItem key={petType} value={petType}>
+                    {petType}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="birthday">Birthday</Label>
+          <Input name="birthday" id="birthday" />
+        </div>
 
         <div className="flex items-center justify-between">
           <Button type="submit">Add pet</Button>
@@ -47,6 +51,6 @@ export function Create({}: CreateProps) {
           </Button>
         </div>
       </Form>
-    </DefaultLayout>
+    </div>
   );
 }

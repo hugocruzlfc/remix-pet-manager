@@ -1,5 +1,4 @@
 import CurrentPagination from "@/components/CurrentPagination";
-import DefaultLayout from "@/components/layouts/Default";
 import { PetTile } from "@/components/PetTile";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TypographyH3 } from "@/components/ui/typography";
 import { prisma } from "@/lib/prisma-client";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
@@ -77,8 +77,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function () {
   const { pets, count } = useLoaderData<typeof loader>();
   const totalPages = Math.ceil(count / PER_PAGE);
+
   return (
-    <DefaultLayout title="Pets!">
+    <div className="space-y-5">
+      <TypographyH3 title="Pets" />
       <Form
         // onChange={handleChange}
         className="flex flex-wrap items-end gap-x-4 space-y-5"
@@ -160,6 +162,6 @@ export default function () {
       {totalPages > 1 && (
         <CurrentPagination totalPages={totalPages} pageParam="page" />
       )}
-    </DefaultLayout>
+    </div>
   );
 }
