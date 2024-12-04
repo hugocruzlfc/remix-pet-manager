@@ -1,6 +1,17 @@
+import CurrentPagination from "@/components/CurrentPagination";
 import DefaultLayout from "@/components/layouts/Default";
+import { PetTile } from "@/components/PetTile";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { prisma } from "@/lib/prisma-client";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
@@ -65,11 +76,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function () {
   const { pets, count } = useLoaderData<typeof loader>();
+  const totalPages = Math.ceil(count / PER_PAGE);
   return (
     <DefaultLayout title="Pets!">
       <Form
         // onChange={handleChange}
-        className="grid flex-wrap items-end gap-x-4 gap-y-2 sm:flex"
+        className="flex flex-wrap items-end gap-x-4 space-y-5"
       >
         <Input
           name="search"
@@ -78,8 +90,8 @@ export default function () {
           className="flex-grow"
         />
 
-        <div className="order-1 flex w-full gap-8">
-          <div className="flex gap-2">
+        <div className="flex w-full gap-8">
+          {/* <div className="flex gap-2">
             <label htmlFor="orderBy">Sort By:</label>
             <select
               name="orderBy"
@@ -90,8 +102,8 @@ export default function () {
               <option value="name">Name</option>
               <option value="updatedAt">Updated</option>
             </select>
-          </div>
-          <div className="flex gap-2">
+          </div> */}
+          {/* <div className="flex gap-2">
             <label htmlFor="orderDir">Direction:</label>
             <select
               name="orderDir"
@@ -102,24 +114,52 @@ export default function () {
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
             </select>
-          </div>
+          </div> */}
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="updatedAt">Updated</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a direction" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="asc">Ascending</SelectItem>
+                <SelectItem value="desc">Descending</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
-        <Button type="submit">Search</Button>
+        <Button type="submit" className="w-full">
+          Search
+        </Button>
       </Form>
 
-      <div className="mt-4" aria-live="polite">
+      <div className="my-4" aria-live="polite">
         <p>{`Displaying ${pets.length} of ${count}.`}</p>
       </div>
 
-      {/* <Grid
-        items={pets.map((pet) => (
-          <Card to={`/pet/${pet.id}`} title={pet.name} type={pet.type}></Card>
-        ))}
-      ></Grid>
+      {pets.length > 0 ? (
+        pets.map((pet) => <PetTile key={pet.id} pet={pet} />)
+      ) : (
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle>Not pets found!</CardTitle>
+          </CardHeader>
+        </Card>
+      )}
 
       {totalPages > 1 && (
-        <Pagination totalPages={totalPages} pageParam="page" className="mt-8" />
-      )} */}
+        <CurrentPagination totalPages={totalPages} pageParam="page" />
+      )}
     </DefaultLayout>
   );
 }

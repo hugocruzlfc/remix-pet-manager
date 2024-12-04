@@ -13,10 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PetType {
+  Bird
+  Dog
+  Fish
+  Cat
+  Bunny
+  Reptile
+}
+
 model Pet {
   id        String    @id @default(cuid())
   name      String
-  type      String
+  type      PetType
   birthday  DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
